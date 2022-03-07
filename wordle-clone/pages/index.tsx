@@ -2,55 +2,380 @@ import type { NextPage } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
+import { useState } from 'react';
 
 const Home: NextPage = () => {
+
+  const maxAttempts = 6
+
+  const defaultAttemps = [
+    [{
+      valid: false,
+      correct: false,
+      value: ''
+    }, 
+    {
+      valid: false,
+      correct: false,
+      value: ''
+    }, 
+    {
+      valid: false,
+      correct: false,
+      value: ''
+    }, 
+    {
+      valid: false,
+      correct: false,
+      value: ''
+    }, 
+    {
+      valid: false,
+      correct: false,
+      value: ''
+    }],
+    [{
+      valid: false,
+      correct: false,
+      value: ''
+    }, 
+    {
+      valid: false,
+      correct: false,
+      value: ''
+    }, 
+    {
+      valid: false,
+      correct: false,
+      value: ''
+    }, 
+    {
+      valid: false,
+      correct: false,
+      value: ''
+    }, 
+    {
+      valid: false,
+      correct: false,
+      value: ''
+    }],
+    [{
+      valid: false,
+      correct: false,
+      value: ''
+    }, 
+    {
+      valid: false,
+      correct: false,
+      value: ''
+    }, 
+    {
+      valid: false,
+      correct: false,
+      value: ''
+    }, 
+    {
+      valid: false,
+      correct: false,
+      value: ''
+    }, 
+    {
+      valid: false,
+      correct: false,
+      value: ''
+    }],    [{
+      valid: false,
+      correct: false,
+      value: ''
+    }, 
+    {
+      valid: false,
+      correct: false,
+      value: ''
+    }, 
+    {
+      valid: false,
+      correct: false,
+      value: ''
+    }, 
+    {
+      valid: false,
+      correct: false,
+      value: ''
+    }, 
+    {
+      valid: false,
+      correct: false,
+      value: ''
+    }],    [{
+      valid: false,
+      correct: false,
+      value: ''
+    }, 
+    {
+      valid: false,
+      correct: false,
+      value: ''
+    }, 
+    {
+      valid: false,
+      correct: false,
+      value: ''
+    }, 
+    {
+      valid: false,
+      correct: false,
+      value: ''
+    }, 
+    {
+      valid: false,
+      correct: false,
+      value: ''
+    }],    [{
+      valid: false,
+      correct: false,
+      value: ''
+    }, 
+    {
+      valid: false,
+      correct: false,
+      value: ''
+    }, 
+    {
+      valid: false,
+      correct: false,
+      value: ''
+    }, 
+    {
+      valid: false,
+      correct: false,
+      value: ''
+    }, 
+    {
+      valid: false,
+      correct: false,
+      value: ''
+    }],
+  ];
+
+  const [disabledButtons, setDisabled] = useState<string[]>([]);
+
+  const [game, setGame] = useState({
+    attemptCount: 0,
+    letterPositon: 0,
+    attemps: defaultAttemps,
+  })
+
+  
+  const answer = 'nasty';
+
+  const gameBoxElement = (row: number, position: number) => {
+    return game.attemps[row][position].value;
+  }
+
+  const getBackgrounColoring = (row: number, position: number) => {
+    let item = game.attemps[row][position];
+    console.log(row, position)
+    console.log(item)
+    if (item.correct) {
+      return '#20BA08'
+    }
+
+    if (item.valid) {
+      return '#B6BA08'
+    }
+
+    return '#484848'
+  };
+
+  const getDisabled = (value: string) => {
+    return disabledButtons.includes(value.toLowerCase()) ? '#252525' : '#484848'
+  }
+
+
+  const handleDeleteInput = () => {
+    console.log(game.attemps)
+      if (game.letterPositon === 0) {
+        return
+      }
+      let temp = [...game.attemps];
+      let newPosition = game.letterPositon - 1;
+      temp[game.attemptCount][newPosition].value = '';
+      setGame({
+        attemptCount: game.attemptCount,
+        letterPositon: newPosition,
+        attemps: temp,
+      })
+  
+      return;
+  }
+  
+  const handleInput = (input: string) => {
+    if (game.attemptCount > 6) {
+      console.log('no more attemps');
+      return;
+    }
+    
+
+    if (game.letterPositon > 4) {
+      console.log('Amount of letters maxed')
+      return;
+    }
+
+    let temp = [...game.attemps];
+    let newPosition = game.letterPositon + 1;
+    temp[game.attemptCount][game.letterPositon].value = input;
+
+    setGame({
+      attemptCount: game.attemptCount,
+      letterPositon: newPosition,
+      attemps: temp,
+    })
+
+
+  };
+
+  const handleEnter = () => {
+      if (game.letterPositon !== 5) {
+        console.log("NOT ENOUGH")
+        return;
+      }
+
+      if (game.attemptCount === 6) {
+        console.log("no more")
+        return;
+      }
+
+      let current = game.attemps[game.attemptCount];
+
+      let updated = validateAnswer(current);
+
+      let temp = [...game.attemps];
+      temp[game.attemptCount] = updated;
+
+      setGame({
+        attemptCount: game.attemptCount + 1,
+        letterPositon: 0,
+        attemps: temp,
+      });
+
+  };
+
+
+  const validateAnswer = (current: any) => {
+    let temp = [...current]
+    let validation = answer.toLowerCase().split('');
+    let notIncludedLetters: any[] = [];
+
+    for (let item in temp) {
+        let pos = temp[item];
+        
+        if (validation.includes(pos.value.toLowerCase())) {
+          temp[item].valid = true;
+        } else {
+          notIncludedLetters.push(pos.value.toLowerCase());
+          continue
+        }
+
+        if (validation[item] === pos.value.toLowerCase()) {
+          temp[item].correct = true
+        }
+    }
+
+    setDisabled([...notIncludedLetters, ...disabledButtons])
+
+    return temp
+  }
+
+
+
+
+
   return (
     <div className={styles.container}>
       <Head>
-        <title>Create Next App</title>
-        <meta name="description" content="Generated by create next app" />
+        <title>Wordle The Clone</title>
+        <meta name="description" content="Famous wordle the clone" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.tsx</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h2>Documentation &rarr;</h2>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h2>Learn &rarr;</h2>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/canary/examples"
-            className={styles.card}
-          >
-            <h2>Examples &rarr;</h2>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h2>Deploy &rarr;</h2>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
+        <div className={styles.navbar}>
+          <button>Menu</button>
+          <h1>Wordle</h1>
+          <button>Settings</button>
+        </div>        
+        <div id='game-board' className={styles.gameboard}>
+          <div id="card-0-1" style={{backgroundColor: getBackgrounColoring(0, 0)}} className={styles.gamebox}>{gameBoxElement(0, 0)}</div>
+          <div id="card-0-2" style={{backgroundColor: getBackgrounColoring(0, 1)}} className={styles.gamebox}>{gameBoxElement(0, 1)}</div>
+          <div id="card-0-3" style={{backgroundColor: getBackgrounColoring(0, 2)}} className={styles.gamebox}>{gameBoxElement(0, 2)}</div>
+          <div id="card-0-4" style={{backgroundColor: getBackgrounColoring(0, 3)}} className={styles.gamebox}>{gameBoxElement(0, 3)}</div>
+          <div id="card-0-5" style={{backgroundColor: getBackgrounColoring(0, 4)}} className={styles.gamebox}>{gameBoxElement(0, 4)}</div>
+          <div id="card-1-1" style={{backgroundColor: getBackgrounColoring(1, 0)}} className={styles.gamebox}>{gameBoxElement(1, 0)}</div>
+          <div id="card-1-2" style={{backgroundColor: getBackgrounColoring(1, 1)}} className={styles.gamebox}>{gameBoxElement(1, 1)}</div>
+          <div id="card-1-3" style={{backgroundColor: getBackgrounColoring(1, 2)}} className={styles.gamebox}>{gameBoxElement(1, 2)}</div>
+          <div id="card-1-4" style={{backgroundColor: getBackgrounColoring(1, 3)}} className={styles.gamebox}>{gameBoxElement(1, 3)}</div>
+          <div id="card-1-5" style={{backgroundColor: getBackgrounColoring(1, 4)}} className={styles.gamebox}>{gameBoxElement(1, 4)}</div>
+          <div id="card-2-1" style={{backgroundColor: getBackgrounColoring(2, 0)}} className={styles.gamebox}>{gameBoxElement(2, 0)}</div>
+          <div id="card-2-2" style={{backgroundColor: getBackgrounColoring(2, 1)}} className={styles.gamebox}>{gameBoxElement(2, 1)}</div>
+          <div id="card-2-3" style={{backgroundColor: getBackgrounColoring(2, 2)}} className={styles.gamebox}>{gameBoxElement(2, 2)}</div>
+          <div id="card-2-4" style={{backgroundColor: getBackgrounColoring(2, 3)}} className={styles.gamebox}>{gameBoxElement(2, 3)}</div>
+          <div id="card-2-5" style={{backgroundColor: getBackgrounColoring(2, 4)}} className={styles.gamebox}>{gameBoxElement(2, 4)}</div>
+          <div id="card-3-1" style={{backgroundColor: getBackgrounColoring(3, 0)}} className={styles.gamebox}>{gameBoxElement(3, 0)}</div>
+          <div id="card-3-2" style={{backgroundColor: getBackgrounColoring(3, 1)}} className={styles.gamebox}>{gameBoxElement(3, 1)}</div>
+          <div id="card-3-3" style={{backgroundColor: getBackgrounColoring(3, 2)}} className={styles.gamebox}>{gameBoxElement(3, 2)}</div>
+          <div id="card-3-4" style={{backgroundColor: getBackgrounColoring(3, 3)}} className={styles.gamebox}>{gameBoxElement(3, 3)}</div>
+          <div id="card-3-5" style={{backgroundColor: getBackgrounColoring(3, 4)}} className={styles.gamebox}>{gameBoxElement(3, 4)}</div>
+          <div id="card-4-1" style={{backgroundColor: getBackgrounColoring(4, 0)}} className={styles.gamebox}>{gameBoxElement(4, 0)}</div>
+          <div id="card-4-2" style={{backgroundColor: getBackgrounColoring(4, 1)}} className={styles.gamebox}>{gameBoxElement(4, 1)}</div>
+          <div id="card-4-3" style={{backgroundColor: getBackgrounColoring(4, 2)}} className={styles.gamebox}>{gameBoxElement(4, 2)}</div>
+          <div id="card-4-4" style={{backgroundColor: getBackgrounColoring(4, 3)}} className={styles.gamebox}>{gameBoxElement(4, 3)}</div>
+          <div id="card-4-5" style={{backgroundColor: getBackgrounColoring(4, 4)}} className={styles.gamebox}>{gameBoxElement(4, 4)}</div>
+          <div id="card-5-1" style={{backgroundColor: getBackgrounColoring(5, 0)}} className={styles.gamebox}>{gameBoxElement(5, 0)}</div>
+          <div id="card-5-2" style={{backgroundColor: getBackgrounColoring(5, 1)}} className={styles.gamebox}>{gameBoxElement(5, 1)}</div>
+          <div id="card-5-3" style={{backgroundColor: getBackgrounColoring(5, 2)}} className={styles.gamebox}>{gameBoxElement(5, 2)}</div>
+          <div id="card-5-4" style={{backgroundColor: getBackgrounColoring(5, 3)}} className={styles.gamebox}>{gameBoxElement(5, 3)}</div>
+          <div id="card-5-5" style={{backgroundColor: getBackgrounColoring(5, 4)}} className={styles.gamebox}>{gameBoxElement(5, 4)}</div>
         </div>
+
+        <div className={styles.gameinput}>
+          <div className={styles.gameinputrow}>  
+            <button style={{backgroundColor: getDisabled('Q')}} onClick={() => {handleInput('Q')}} className={styles.gameinputbutton}>Q</button>
+            <button style={{backgroundColor: getDisabled('W')}} onClick={() => {handleInput('W')}} className={styles.gameinputbutton}>W</button>
+            <button style={{backgroundColor: getDisabled('E')}} onClick={() => {handleInput('E')}} className={styles.gameinputbutton}>E</button>
+            <button style={{backgroundColor: getDisabled('R')}} onClick={() => {handleInput('R')}} className={styles.gameinputbutton}>R</button>
+            <button style={{backgroundColor: getDisabled('T')}} onClick={() => {handleInput('T')}} className={styles.gameinputbutton}>T</button>
+            <button style={{backgroundColor: getDisabled('Y')}} onClick={() => {handleInput('Y')}} className={styles.gameinputbutton}>Y</button>
+            <button style={{backgroundColor: getDisabled('U')}} onClick={() => {handleInput('U')}} className={styles.gameinputbutton}>U</button>
+            <button style={{backgroundColor: getDisabled('I')}} onClick={() => {handleInput('I')}} className={styles.gameinputbutton}>I</button>
+            <button style={{backgroundColor: getDisabled('O')}} onClick={() => {handleInput('O')}} className={styles.gameinputbutton}>O</button>
+            <button style={{backgroundColor: getDisabled('P')}} onClick={() => {handleInput('P')}} className={styles.gameinputbutton}>P</button>
+          </div>
+          <div className={styles.gameinputrow}>  
+            <button style={{backgroundColor: getDisabled('A')}} onClick={() => {handleInput('A')}} className={styles.gameinputbutton}>A</button>
+            <button style={{backgroundColor: getDisabled('S')}} onClick={() => {handleInput('S')}} className={styles.gameinputbutton}>S</button>
+            <button style={{backgroundColor: getDisabled('D')}} onClick={() => {handleInput('D')}} className={styles.gameinputbutton}>D</button>
+            <button style={{backgroundColor: getDisabled('F')}} onClick={() => {handleInput('F')}} className={styles.gameinputbutton}>F</button>
+            <button style={{backgroundColor: getDisabled('G')}} onClick={() => {handleInput('G')}} className={styles.gameinputbutton}>G</button>
+            <button style={{backgroundColor: getDisabled('H')}} onClick={() => {handleInput('H')}} className={styles.gameinputbutton}>H</button>
+            <button style={{backgroundColor: getDisabled('J')}} onClick={() => {handleInput('J')}}className={styles.gameinputbutton}>J</button>
+            <button style={{backgroundColor: getDisabled('K')}} onClick={() => {handleInput('K')}} className={styles.gameinputbutton}>K</button>
+            <button style={{backgroundColor: getDisabled('L')}} onClick={() => {handleInput('L')}} className={styles.gameinputbutton}>L</button>
+          </div>
+          <div className={styles.gameinputrow}>  
+            <button onClick={() => {handleEnter()}} className={styles.gameinputbutton}>ENTER</button>
+            <button style={{backgroundColor: getDisabled('Z')}} onClick={() => {handleInput('Z')}} className={styles.gameinputbutton}>Z</button>
+            <button style={{backgroundColor: getDisabled('X')}} onClick={() => {handleInput('X')}} className={styles.gameinputbutton}>X</button>
+            <button style={{backgroundColor: getDisabled('C')}} onClick={() => {handleInput('C')}} className={styles.gameinputbutton}>C</button>
+            <button style={{backgroundColor: getDisabled('V')}} onClick={() => {handleInput('V')}} className={styles.gameinputbutton}>V</button>
+            <button style={{backgroundColor: getDisabled('B')}} onClick={() => {handleInput('B')}} className={styles.gameinputbutton}>B</button>
+            <button style={{backgroundColor: getDisabled('N')}} onClick={() => {handleInput('N')}} className={styles.gameinputbutton}>N</button>
+            <button style={{backgroundColor: getDisabled('M')}} onClick={() => {handleInput('M')}} className={styles.gameinputbutton}>M</button>
+            <button onClick={() => {handleDeleteInput()}} className={styles.gameinputbutton}>DEL</button>
+          </div>
+        </div>
+
+
       </main>
 
       <footer className={styles.footer}>

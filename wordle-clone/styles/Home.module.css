@@ -1,14 +1,16 @@
 .container {
   padding: 0 2rem;
+  background-color: black;
 }
 
 .main {
   min-height: 100vh;
   padding: 4rem 0;
+  padding-top: 0;
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
 }
 
@@ -107,6 +109,81 @@
   height: 1em;
   margin-left: 0.5rem;
 }
+
+.gameboard {
+  display: grid;
+  grid-template-columns: repeat(5, 4rem);
+  grid-template-rows: repeat(6, 4rem);
+  grid-gap: 10px;
+}
+
+.gamebox {
+  border: 1px solid rgba(255, 255,255, 0.5);
+  background-color: #484848;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 5px;
+  color: white;
+  font-weight: bold;
+  font-size: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+}
+
+.maintitle {
+  color: #3DB22E
+}
+
+.gameinput {
+  margin-top: 10px;
+}
+
+
+.gameinputrow {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 5px;
+}
+
+.gameinputbutton {
+  color: white;
+  background-color: #484848;
+  border: none;
+  padding: 1.2rem;
+  margin-left: 5px;
+  border-radius: 5px;
+}
+
+.gameinputbutton:active {
+  background-color: #878787;
+}
+
+.gameinputbutton:disabled {
+  background-color: #252525;
+}
+
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  width: 100vw;
+  padding: 0 10px;
+  align-items: center;
+}
+
+.navbar h1 {
+  color: white;
+}
+
+.navbar button {
+  border: none;
+  color: white;
+  background-color: black;
+}
+
+
 
 @media (max-width: 600px) {
   .grid {
