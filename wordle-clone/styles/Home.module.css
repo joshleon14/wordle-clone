@@ -183,6 +183,16 @@
   background-color: black;
 }
 
+.wonMessage {
+  color: white;
+  background-color: #484848;
+  padding: 1rem;
+  border-radius: 10px;
+  font-weight: bold;
+  position: absolute;
+  top: 10vh;
+}
+
 
 
 @media (max-width: 600px) {

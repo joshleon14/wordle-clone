@@ -2,11 +2,16 @@ import type { NextPage } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const Home: NextPage = () => {
 
   const maxAttempts = 6
+
+  const [answer, setAnswer] = useState('');
+
+  const [won, setWon] = useState(false);
+
 
   const defaultAttemps = [
     [{
@@ -164,10 +169,22 @@ const Home: NextPage = () => {
     attemptCount: 0,
     letterPositon: 0,
     attemps: defaultAttemps,
-  })
+  });
+
+const getDailyWord = async () => {
+  const response = await fetch('/api/word/');
+  
+  if (!response.ok) {
+    throw new Error(`Error: ${response.status}`)
+  }
+
+  const data = await response.json();
+  console.log(data);
+
+  setAnswer(data.word);
+};
 
   
-  const answer = 'nasty';
 
   const gameBoxElement = (row: number, position: number) => {
     return game.attemps[row][position].value;
@@ -175,8 +192,6 @@ const Home: NextPage = () => {
 
   const getBackgrounColoring = (row: number, position: number) => {
     let item = game.attemps[row][position];
-    console.log(row, position)
-    console.log(item)
     if (item.correct) {
       return '#20BA08'
     }
@@ -194,7 +209,10 @@ const Home: NextPage = () => {
 
 
   const handleDeleteInput = () => {
-    console.log(game.attemps)
+      if (won) {
+        return
+      }
+    
       if (game.letterPositon === 0) {
         return
       }
@@ -211,6 +229,11 @@ const Home: NextPage = () => {
   }
   
   const handleInput = (input: string) => {
+
+    if (won) {
+      return
+    }
+
     if (game.attemptCount > 6) {
       console.log('no more attemps');
       return;
@@ -236,6 +259,10 @@ const Home: NextPage = () => {
   };
 
   const handleEnter = () => {
+    if (won) {
+      return
+    }
+
       if (game.letterPositon !== 5) {
         console.log("NOT ENOUGH")
         return;
@@ -249,6 +276,7 @@ const Home: NextPage = () => {
       let current = game.attemps[game.attemptCount];
 
       let updated = validateAnswer(current);
+      didWin(updated);
 
       let temp = [...game.attemps];
       temp[game.attemptCount] = updated;
@@ -288,8 +316,22 @@ const Home: NextPage = () => {
   }
 
 
+  const didWin = (updated: any) => {
+    let tempWon = true;
+    for (let item of updated) {
+      if (!item.correct) {
+        tempWon = false;
+      }
+    }
+
+    setWon(tempWon)
+  }
 
 
+
+useEffect(() => {
+  getDailyWord();
+}, []);
 
   return (
     <div className={styles.container}>
@@ -304,7 +346,9 @@ const Home: NextPage = () => {
           <button>Menu</button>
           <h1>Wordle</h1>
           <button>Settings</button>
-        </div>        
+        </div>
+        {won ? <div className={styles.wonMessage}>You Won!</div>: null}
+                
         <div id='game-board' className={styles.gameboard}>
           <div id="card-0-1" style={{backgroundColor: getBackgrounColoring(0, 0)}} className={styles.gamebox}>{gameBoxElement(0, 0)}</div>
           <div id="card-0-2" style={{backgroundColor: getBackgrounColoring(0, 1)}} className={styles.gamebox}>{gameBoxElement(0, 1)}</div>
