@@ -164,6 +164,8 @@ const Home: NextPage = () => {
   ];
 
   const [disabledButtons, setDisabled] = useState<string[]>([]);
+  const [correctLetters, setCorrectLetters] = useState<string[]>([]);
+  const [validLetters, setValidLetters] = useState<string[]>([]);
 
   const [game, setGame] = useState({
     attemptCount: 0,
@@ -184,6 +186,11 @@ const getDailyWord = async () => {
   setAnswer(data.word);
 };
 
+  const numberOfApperance = (ch: string) => {
+    let count = answer.toLocaleLowerCase().split('').filter(x => x == ch).length
+    return count
+
+  }
   
 
   const gameBoxElement = (row: number, position: number) => {
@@ -197,6 +204,13 @@ const getDailyWord = async () => {
     }
 
     if (item.valid) {
+      if (correctLetters.includes(item.value.toLocaleLowerCase())) {
+        if (numberOfApperance(item.value.toLocaleLowerCase()) === 1) {
+          return '#484848'
+        }
+        return '#B6BA08'
+      }
+      
       return '#B6BA08'
     }
 
@@ -204,7 +218,18 @@ const getDailyWord = async () => {
   };
 
   const getDisabled = (value: string) => {
-    return disabledButtons.includes(value.toLowerCase()) ? '#252525' : '#484848'
+    if (disabledButtons.includes(value.toLowerCase())) {
+      return '#252525'
+    }
+
+    if (correctLetters.includes(value.toLocaleLowerCase())) {
+      return '#20BA08'
+    }
+
+    if (validLetters.includes(value.toLocaleLowerCase())) {
+      return '#B6BA08'
+    }
+    return '#484848'
   }
 
 
@@ -294,12 +319,16 @@ const getDailyWord = async () => {
     let temp = [...current]
     let validation = answer.toLowerCase().split('');
     let notIncludedLetters: any[] = [];
+    let valid: any[] = [];
+    let correct: any[] = [];
 
     for (let item in temp) {
         let pos = temp[item];
         
         if (validation.includes(pos.value.toLowerCase())) {
           temp[item].valid = true;
+          valid.push(pos.value.toLowerCase())
+
         } else {
           notIncludedLetters.push(pos.value.toLowerCase());
           continue
@@ -307,10 +336,13 @@ const getDailyWord = async () => {
 
         if (validation[item] === pos.value.toLowerCase()) {
           temp[item].correct = true
+          correct.push(pos.value.toLowerCase())
         }
     }
 
-    setDisabled([...notIncludedLetters, ...disabledButtons])
+    setDisabled([...notIncludedLetters, ...disabledButtons]);
+    setValidLetters([...valid, ...validLetters]);
+    setCorrectLetters([...correct, ...correctLetters]);
 
     return temp
   }
