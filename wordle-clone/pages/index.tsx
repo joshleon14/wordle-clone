@@ -10,7 +10,9 @@ const Home: NextPage = () => {
 
   const [answer, setAnswer] = useState('');
 
-  const [won, setWon] = useState(false);
+  const [status, setStatus] = useState('');
+  const [showNEL, setShowNEL] = useState(false);
+  
 
 
   const defaultAttemps = [
@@ -204,8 +206,8 @@ const getDailyWord = async () => {
     }
 
     if (item.valid) {
-      if (correctLetters.includes(item.value.toLocaleLowerCase())) {
-        if (numberOfApperance(item.value.toLocaleLowerCase()) === 1) {
+      if (numberOfApperance(item.value.toLocaleLowerCase()) === 1) {
+        if (correctLetters.includes(item.value.toLocaleLowerCase())) {
           return '#484848'
         }
         return '#B6BA08'
@@ -234,7 +236,7 @@ const getDailyWord = async () => {
 
 
   const handleDeleteInput = () => {
-      if (won) {
+      if (status === 'won' || status === 'lost') {
         return
       }
     
@@ -255,7 +257,7 @@ const getDailyWord = async () => {
   
   const handleInput = (input: string) => {
 
-    if (won) {
+    if (status === 'won' || status === 'lost') {
       return
     }
 
@@ -284,12 +286,16 @@ const getDailyWord = async () => {
   };
 
   const handleEnter = () => {
-    if (won) {
+    if (status === 'won' || status === 'lost') {
       return
     }
 
       if (game.letterPositon !== 5) {
         console.log("NOT ENOUGH")
+        setShowNEL(true);
+        setTimeout(() => {
+          setShowNEL(false)
+        }, 1500);
         return;
       }
 
@@ -311,6 +317,10 @@ const getDailyWord = async () => {
         letterPositon: 0,
         attemps: temp,
       });
+
+      if (game.attemptCount === 5) {
+        setStatus('lost');
+      }
 
   };
 
@@ -356,7 +366,7 @@ const getDailyWord = async () => {
       }
     }
 
-    setWon(tempWon)
+    setStatus(tempWon ? 'won': '')
   }
 
 
@@ -379,7 +389,9 @@ useEffect(() => {
           <h1>Wordle</h1>
           <button>Settings</button>
         </div>
-        {won ? <div className={styles.wonMessage}>You Won!</div>: null}
+        {status === 'won' ? <div className={styles.wonMessage}>You Won!</div>: null}
+        {status === 'lost' ? <div className={styles.wonMessage}>You Lost!</div>: null}
+        {showNEL ?  <div className={styles.nelMesg}>Not Enough Letters!</div> : null}
                 
         <div id='game-board' className={styles.gameboard}>
           <div id="card-0-1" style={{backgroundColor: getBackgrounColoring(0, 0)}} className={styles.gamebox}>{gameBoxElement(0, 0)}</div>
